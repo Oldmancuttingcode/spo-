@@ -1,0 +1,16 @@
+[package]
+name = "music-archive"
+version = "0.1.0"
+description = "A personal desktop music archive."
+authors = ["Music Archive"]
+edition = "2021"
+
+[lib]
+name = "music_archive_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
