@@ -106,4 +106,32 @@ mod tests {
 
         assert_eq!(enabled, 1);
     }
+
+    #[test]
+    #[ignore = "reads the local app-data database for manual validation"]
+    fn local_app_data_database_counts_phase_five_tables() {
+        let database_path =
+            std::path::PathBuf::from(std::env::var("APPDATA").expect("APPDATA is set"))
+                .join("com.local.musicarchive")
+                .join("music-archive.db");
+        let connection = rusqlite::Connection::open_with_flags(
+            &database_path,
+            rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+        )
+        .expect("local app-data database opens read-only");
+
+        for table in [
+            "artists",
+            "tracks",
+            "track_artists",
+            "play_history",
+            "sync_state",
+        ] {
+            let query = format!("SELECT COUNT(*) FROM {table}");
+            let count: i64 = connection
+                .query_row(&query, [], |row| row.get(0))
+                .expect("table count can be read");
+            println!("{table}={count}");
+        }
+    }
 }

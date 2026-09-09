@@ -27,7 +27,8 @@ pub fn run() {
             database_health,
             spotify::spotify_connection_status,
             spotify::spotify_connect,
-            spotify::spotify_disconnect
+            spotify::spotify_disconnect,
+            spotify::spotify_recently_played
         ])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");
