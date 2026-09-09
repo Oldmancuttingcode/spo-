@@ -1,4 +1,5 @@
 mod database;
+pub mod music;
 
 use tauri::Manager;
 use tauri::State;
