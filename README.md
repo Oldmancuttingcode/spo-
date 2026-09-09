@@ -4,9 +4,11 @@ Music Archive is a personal desktop application for recording music discovery, l
 
 ## Current Status
 
-Phase 0 - Project foundation
+Phase 2 - SQLite foundation
 
-This phase only establishes the Tauri, React, and TypeScript project foundation. Spotify, SQLite, sync, library, playlist, tagging, notes, dashboards, and other product features are not implemented yet.
+The Tauri, React, and TypeScript project foundation is in place, along with the Phase 1 navigation shell and the Phase 2 SQLite foundation. The backend creates a local `music-archive.db` in the app data directory, enables foreign keys, and runs migration tracking.
+
+Spotify, sync, library, playlist, tagging, notes, dashboards, and the core Music Archive schema are not implemented yet.
 
 ## Tech Stack
 
