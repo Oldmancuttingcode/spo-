@@ -4,11 +4,11 @@ Music Archive is a personal desktop application for recording music discovery, l
 
 ## Current Status
 
-Phase 2 - SQLite foundation
+Phase 4 - Spotify authentication
 
-The Tauri, React, and TypeScript project foundation is in place, along with the Phase 1 navigation shell and the Phase 2 SQLite foundation. The backend creates a local `music-archive.db` in the app data directory, enables foreign keys, and runs migration tracking.
+The Tauri, React, and TypeScript project foundation is in place, along with the navigation shell, backend-owned SQLite archive, core music database schema, and Spotify account authentication. The backend creates a local `music-archive.db` in the app data directory, enables foreign keys, and runs migration tracking.
 
-Spotify, sync, library, playlist, tagging, notes, dashboards, and the core Music Archive schema are not implemented yet.
+Spotify Recently Played sync, playlist sync, library workflows, tagging workflows, notes workflows, dashboards, and playback are not implemented yet.
 
 ## Tech Stack
 
@@ -33,6 +33,28 @@ Install frontend dependencies:
 ```sh
 npm install
 ```
+
+Configure Spotify authentication:
+
+1. Create a Spotify app in the Spotify Developer Dashboard.
+2. Add this redirect URI to the Spotify app:
+
+```text
+http://127.0.0.1:8888/callback
+```
+
+3. Set your Spotify app Client ID before launching Music Archive.
+
+PowerShell:
+
+```powershell
+$env:SPOTIFY_CLIENT_ID = "your_spotify_client_id"
+npm run tauri -- dev
+```
+
+The Spotify Client ID is not a secret. Do not configure a Client Secret for this
+desktop app. If `SPOTIFY_CLIENT_ID` is missing, the Settings page shows a
+connection error and no Spotify credentials are stored.
 
 Run the Tauri development app:
 

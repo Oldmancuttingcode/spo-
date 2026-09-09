@@ -1,5 +1,6 @@
 mod database;
 pub mod music;
+pub mod spotify;
 
 use tauri::Manager;
 use tauri::State;
@@ -19,9 +20,15 @@ pub fn run() {
                 database.path().display()
             );
             app.manage(database);
+            app.manage(spotify::SpotifyAuth::new());
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![database_health])
+        .invoke_handler(tauri::generate_handler![
+            database_health,
+            spotify::spotify_connection_status,
+            spotify::spotify_connect,
+            spotify::spotify_disconnect
+        ])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");
 }
