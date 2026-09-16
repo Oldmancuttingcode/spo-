@@ -51,5 +51,8 @@
 .library-table th:last-child { width: 135px; }
 .library-table td { color: #4c5450; font-size: 0.9rem; line-height: 1.45; }
 .library-table .library-track-title { color: #202124; font-weight: 600; }
-.library-artwork { display: block; width: 52px; height: 52px; border-radius: 4px; object-fit: cover; }
-.library-artwork-placeholder { display: grid; place-items: center; background: #e4e9e3; color: #66756c; font-size: 1.5rem; }
+.library-artwork { width: 52px; height: 52px; }
+.library-table tbody tr { cursor: pointer; }
+.library-table tbody tr:hover, .library-table tbody tr:focus-within { background: #edf2ef; }
+.library-track-button { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.library-track-button:hover { text-decoration: underline; }

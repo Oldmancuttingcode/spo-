@@ -2,6 +2,7 @@ mod database;
 mod library;
 pub mod music;
 pub mod spotify;
+mod track_detail;
 
 use tauri::Manager;
 use tauri::State;
@@ -27,6 +28,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             database_health,
             library::library_tracks,
+            track_detail::track_detail,
+            track_detail::open_track_in_spotify,
             spotify::spotify_connection_status,
             spotify::spotify_connect,
             spotify::spotify_disconnect,

@@ -1,0 +1,19 @@
+.track-back { margin-bottom: 28px; }
+.track-detail-page button:focus-visible { outline: 2px solid #5e8a7f; outline-offset: 2px; }
+.track-detail-header { display: flex; align-items: center; gap: 28px; }
+.track-detail-artwork { width: 200px; height: 200px; flex-shrink: 0; font-size: 3rem; }
+.track-detail-metadata { min-width: 0; overflow-wrap: anywhere; }
+.track-detail-label { margin: 0 0 10px; color: #4c5450; font-size: 0.85rem; }
+.track-detail-artists { margin: 16px 0 8px; font-size: 1.15rem; color: #2f3734; }
+.track-detail-album, .track-detail-duration { margin: 8px 0 0; color: #4c5450; line-height: 1.5; }
+.track-listening { margin-top: 36px; padding-top: 24px; border-top: 1px solid #dfe4dd; }
+.track-listening h2 { margin: 0 0 20px; font-size: 1.1rem; }
+.track-listening dl { display: flex; flex-wrap: wrap; gap: 24px 40px; margin: 0; }
+.track-listening dt { color: #4c5450; font-size: 0.85rem; margin-bottom: 8px; }
+.track-listening dd { margin: 0; line-height: 1.5; }
+.track-spotify-link { margin-top: 28px; }
+.track-spotify-link [role="alert"] { color: #9b2d25; line-height: 1.5; }
+.track-detail-message { line-height: 1.5; color: #4c5450; }
+@media (max-width: 900px) {
+  .track-detail-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+}

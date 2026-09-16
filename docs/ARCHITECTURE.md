@@ -18,11 +18,11 @@ React UI
 
 ## Current Scope
 
-Phase 7 includes the navigation shell, backend-owned SQLite archive, core music
+Phase 8 includes the navigation shell, backend-owned SQLite archive, core music
 database schema, Spotify authentication, read-only Recently Played retrieval,
-manual listening-history sync into the archive, and local Library browsing.
+manual listening-history sync into the archive, local Library browsing, and Track Detail.
 
-The current implementation does not include Calendar, Track Detail,
+The current implementation does not include Calendar,
 Tags UI, Notes UI, playlist sync, Digging UI, background sync, or playback.
 
 ## Database Layer
@@ -44,6 +44,16 @@ Rust filters the loaded rows using lowercase substring matching for title,
 artist names, and album. The optional search command argument allows later query
 changes without coupling React to SQL. No Spotify request or sync is triggered;
 only artwork images use their stored remote URLs, with a local fallback.
+
+Track Detail uses the internal track ID with the `track_detail` command. A track
+and its play aggregate (`COUNT`, `MIN`, `MAX`) are read separately from its ordered
+artist names, avoiding count multiplication. A missing track returns `None`;
+query failures return a safe error. Library owns the selected track ID and keeps
+its list mounted but hidden during detail browsing, preserving search, rows, and
+scroll position without a router. Artwork fallback and date display are shared.
+The `open_track_in_spotify` command reads the stored URL by track ID, validates
+an HTTPS `open.spotify.com/track/...` URL, and uses the existing OS browser opener.
+Neither detail lookup nor rendering requires Spotify authentication or API calls.
 
 - React UI should not query SQLite directly.
 - React UI should not call the Spotify API directly.

@@ -1,0 +1,2 @@
+.artwork { display: block; border-radius: 4px; object-fit: cover; }
+.artwork-placeholder { display: grid; place-items: center; background: #e4e9e3; color: #66756c; font-size: 1.5rem; }

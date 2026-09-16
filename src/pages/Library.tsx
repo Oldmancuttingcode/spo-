@@ -1,5 +1,8 @@
 import { invoke } from "@tauri-apps/api/core";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Artwork from "../components/Artwork";
+import ArchiveDate from "../components/ArchiveDate";
+import TrackDetail from "./TrackDetail";
 import "./Library.css";
 
 interface LibraryTrack {
@@ -14,33 +17,28 @@ interface LibraryTrack {
   play_count: number;
 }
 
-const dateFormat = new Intl.DateTimeFormat(undefined, {
-  year: "numeric", month: "short", day: "numeric",
-});
-
-function DiscoveryDate({ value }: { value: string | null }) {
-  if (!value) return <>Not yet discovered</>;
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? <>Unknown date</> : (
-    <time dateTime={value} title={date.toLocaleString()}>{dateFormat.format(date)}</time>
-  );
-}
-
-function Artwork({ url }: { url: string | null }) {
-  const [failed, setFailed] = useState(false);
-  return url && !failed ? (
-    <img className="library-artwork" src={url} alt="" loading="lazy" onError={() => setFailed(true)} />
-  ) : (
-    <span className="library-artwork library-artwork-placeholder" role="img" aria-label="No artwork">♪</span>
-  );
-}
-
 export default function Library() {
   const [rows, setRows] = useState<LibraryTrack[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
+  const returnPosition = useRef<{ scrollY: number; button: HTMLButtonElement | null } | null>(null);
+
+  function openTrack(id: number, row: HTMLTableRowElement) {
+    returnPosition.current = { scrollY: window.scrollY, button: row.querySelector("button") };
+    setSelectedTrackId(id);
+  }
+
+  useLayoutEffect(() => {
+    if (selectedTrackId !== null) {
+      window.scrollTo(0, 0);
+    } else if (returnPosition.current) {
+      returnPosition.current.button?.focus({ preventScroll: true });
+      window.scrollTo(0, returnPosition.current.scrollY);
+    }
+  }, [selectedTrackId]);
 
   useEffect(() => {
     let active = true;
@@ -56,7 +54,8 @@ export default function Library() {
   }, [search, attempt]);
 
   return (
-    <section className="page library-page">
+    <>
+    <section className="page library-page" hidden={selectedTrackId !== null}>
       <h1>Library</h1>
       <label className="library-search">
         <span>Search your archive</span>
@@ -88,17 +87,19 @@ export default function Library() {
           <table className="library-table">
             <thead><tr><th scope="col">Artwork</th><th scope="col">Track</th><th scope="col">Artist</th><th scope="col">Album</th><th scope="col">Discovered</th></tr></thead>
             <tbody>{rows.map((track) => (
-              <tr key={track.id}>
-                <td><Artwork key={track.album_art_url} url={track.album_art_url} /></td>
-                <td className="library-track-title">{track.title}</td>
+              <tr key={track.id} onClick={(event) => openTrack(track.id, event.currentTarget)}>
+                <td><Artwork className="library-artwork" url={track.album_art_url} /></td>
+                <td className="library-track-title"><button type="button" className="library-track-button" aria-label={`View ${track.title} by ${track.artist_names || "Unknown artist"}`}>{track.title}</button></td>
                 <td>{track.artist_names || "Unknown artist"}</td>
                 <td>{track.album_name || "Unknown album"}</td>
-                <td><DiscoveryDate value={track.discovered_at} /></td>
+                <td><ArchiveDate value={track.discovered_at} emptyText="Not yet discovered" /></td>
               </tr>
             ))}</tbody>
           </table>
         </div>
       )}
     </section>
+    {selectedTrackId !== null && <TrackDetail key={selectedTrackId} trackId={selectedTrackId} onBack={() => setSelectedTrackId(null)} />}
+    </>
   );
 }
