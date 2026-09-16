@@ -4,13 +4,18 @@ Music Archive is a personal desktop application for recording music discovery, l
 
 ## Current Status
 
-Phase 6 - Listening History Sync
+Phase 7 - Library
 
 The Tauri, React, and TypeScript project foundation is in place, along with the navigation shell, backend-owned SQLite archive, core music database schema, Spotify account authentication, and read-only Spotify Recently Played retrieval for development validation. The backend creates a local `music-archive.db` in the app data directory, enables foreign keys, and runs migration tracking.
 
 Spotify Recently Played can now be synced into SQLite as artists, tracks, track artist relations, play history, and sync progress. Duplicate play history rows are prevented by database constraints, and unsupported/local Spotify items are skipped without failing the rest of the sync.
 
-Playlist sync, library workflows, tagging workflows, notes workflows, dashboards, and playback are not implemented yet.
+Library now browses local archived tracks with artwork, ordered artist credits,
+album names, Discovery dates, and track/artist/album search. It works independently
+of Spotify authentication and API availability; remote artwork falls back to a
+local placeholder when unavailable.
+
+Track Detail, playlist sync, tagging workflows, notes workflows, dashboards, and playback are not implemented yet.
 
 ## Tech Stack
 
