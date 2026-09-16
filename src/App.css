@@ -122,6 +122,12 @@ button {
   gap: 12px;
 }
 
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .settings-text,
 .spotify-status,
 .settings-error {
@@ -141,6 +147,12 @@ button {
 .spotify-status.connected {
   color: #1f6a4f;
   font-weight: 650;
+}
+
+.sync-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .primary-button,

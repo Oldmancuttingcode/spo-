@@ -2,12 +2,16 @@ mod api;
 mod auth;
 mod config;
 mod credentials;
+mod sync;
 
 use serde::Serialize;
 use tauri::State;
 
+use crate::database::Database;
+
 pub use api::{recently_played, RecentlyPlayedResponse};
 pub use auth::SpotifyAuth;
+pub use sync::ListeningHistorySyncResult;
 
 #[derive(Debug, Serialize)]
 pub struct SpotifyConnectionStatus {
@@ -68,6 +72,39 @@ pub fn spotify_recently_played(
 ) -> Result<RecentlyPlayedResponse, String> {
     let access_token = spotify_auth.valid_access_token()?;
     recently_played(&access_token, limit, after, before).map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+pub fn spotify_sync_recently_played(
+    spotify_auth: State<'_, SpotifyAuth>,
+    database: State<'_, Database>,
+) -> Result<ListeningHistorySyncResult, String> {
+    let cursor = database.with_connection(|connection| sync::read_sync_cursor(connection))?;
+    let access_token = spotify_auth.valid_access_token().map_err(|error| {
+        let _ =
+            database.with_connection(|connection| sync::record_sync_failure(connection, &error));
+        error
+    })?;
+
+    let response =
+        api::recently_played(&access_token, Some(50), cursor.after_ms, None).map_err(|error| {
+            let error_message = error.to_string();
+            let _ = database.with_connection(|connection| {
+                sync::record_sync_failure(connection, &error_message)
+            });
+            error_message
+        })?;
+
+    match database
+        .with_connection(|connection| sync::persist_recently_played(connection, &response))
+    {
+        Ok(result) => Ok(result),
+        Err(error) => {
+            let _ = database
+                .with_connection(|connection| sync::record_sync_failure(connection, &error));
+            Err(error)
+        }
+    }
 }
 
 #[cfg(test)]

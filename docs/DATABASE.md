@@ -129,6 +129,25 @@ GROUP BY track_id;
 
 `tracks.created_at` must not be used as discovery time.
 
+## Listening History Sync Writes
+
+Spotify Recently Played sync writes only Spotify-owned archive data and sync
+progress:
+
+- `artists` are inserted or refreshed by `spotify_id`.
+- `tracks` are inserted or refreshed by `spotify_id`.
+- `track_artists` is refreshed for each synced track so Spotify artist ordering
+  stays aligned with current track metadata.
+- `play_history` receives one row per supported listening event, preserving
+  Spotify `played_at` as UTC text.
+- `sync_state` source `recently_played` stores the last successful sync time,
+  the latest processed Spotify play timestamp, status, and last error.
+
+Duplicate listening events are prevented by the existing
+`play_history(track_id, played_at)` uniqueness rule. Spotify sync must not update
+or delete personal metadata tables such as `tags`, `track_tags`, `track_notes`,
+`playlist_notes`, `playlist_tags`, `digging_sessions`, or `digging_tracks`.
+
 ## Calendar and Statistics
 
 Calendar views and statistics are derived from `play_history` and related tables. The database intentionally does not store duplicated calendar summaries, monthly statistics, play counts, most-played tables, or discovery tables.

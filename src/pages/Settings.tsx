@@ -11,11 +11,27 @@ type SpotifyConnectionStatus = {
   message?: string | null;
 };
 
+type ListeningHistorySyncResult = {
+  processedItems: number;
+  newPlayHistoryRows: number;
+  newTrackRows: number;
+  updatedTrackRows: number;
+  newArtistRows: number;
+  skippedItems: number;
+  newDiscoveries: number;
+  latestProcessedPlayedAt?: string | null;
+  lastSuccessfulSyncAt: string;
+};
+
 export default function Settings() {
   const [spotifyStatus, setSpotifyStatus] =
     useState<SpotifyConnectionStatus | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncResult, setSyncResult] =
+    useState<ListeningHistorySyncResult | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
 
   useEffect(() => {
     void loadSpotifyStatus();
@@ -57,6 +73,8 @@ export default function Settings() {
         "spotify_disconnect",
       );
       setSpotifyStatus(status);
+      setSyncResult(null);
+      setSyncError(null);
     } catch (error) {
       setSpotifyStatus({
         state: "authentication_error",
@@ -64,6 +82,21 @@ export default function Settings() {
       });
     } finally {
       setIsDisconnecting(false);
+    }
+  }
+
+  async function syncRecentlyPlayed() {
+    setIsSyncing(true);
+    setSyncError(null);
+    try {
+      const result = await invoke<ListeningHistorySyncResult>(
+        "spotify_sync_recently_played",
+      );
+      setSyncResult(result);
+    } catch (error) {
+      setSyncError(String(error));
+    } finally {
+      setIsSyncing(false);
     }
   }
 
@@ -79,6 +112,10 @@ export default function Settings() {
           status={spotifyStatus}
           onConnect={connectSpotify}
           onDisconnect={disconnectSpotify}
+          isSyncing={isSyncing}
+          syncResult={syncResult}
+          syncError={syncError}
+          onSyncRecentlyPlayed={syncRecentlyPlayed}
         />
       </section>
     </section>
@@ -89,16 +126,24 @@ type SpotifyConnectionContentProps = {
   status: SpotifyConnectionStatus | null;
   isConnecting: boolean;
   isDisconnecting: boolean;
+  isSyncing: boolean;
+  syncResult: ListeningHistorySyncResult | null;
+  syncError: string | null;
   onConnect: () => void;
   onDisconnect: () => void;
+  onSyncRecentlyPlayed: () => void;
 };
 
 function SpotifyConnectionContent({
   status,
   isConnecting,
   isDisconnecting,
+  isSyncing,
+  syncResult,
+  syncError,
   onConnect,
   onDisconnect,
+  onSyncRecentlyPlayed,
 }: SpotifyConnectionContentProps) {
   if (isConnecting) {
     return <p className="settings-text">Connecting to Spotify...</p>;
@@ -108,14 +153,32 @@ function SpotifyConnectionContent({
     return (
       <div className="settings-stack">
         <p className="spotify-status connected">Connected</p>
-        <button
-          className="secondary-button"
-          disabled={isDisconnecting}
-          type="button"
-          onClick={onDisconnect}
-        >
-          {isDisconnecting ? "Disconnecting..." : "Disconnect"}
-        </button>
+        {syncResult ? <SyncSummary syncResult={syncResult} /> : null}
+        <div className="settings-actions">
+          <button
+            className="primary-button"
+            disabled={isSyncing}
+            type="button"
+            onClick={onSyncRecentlyPlayed}
+          >
+            {isSyncing ? "Syncing Spotify..." : syncError ? "Retry" : "Sync Now"}
+          </button>
+          <button
+            className="secondary-button"
+            disabled={isDisconnecting || isSyncing}
+            type="button"
+            onClick={onDisconnect}
+          >
+            {isDisconnecting ? "Disconnecting..." : "Disconnect"}
+          </button>
+        </div>
+        {syncError ? (
+          <div className="settings-stack">
+            <p className="settings-error">Spotify sync failed.</p>
+            <p className="settings-text">Your local archive is still available.</p>
+            <p className="settings-error">{syncError}</p>
+          </div>
+        ) : null}
       </div>
     );
   }
@@ -144,4 +207,39 @@ function SpotifyConnectionContent({
       </button>
     </div>
   );
+}
+
+function SyncSummary({
+  syncResult,
+}: {
+  syncResult: ListeningHistorySyncResult;
+}) {
+  return (
+    <div className="sync-summary">
+      <p className="settings-text">
+        Last sync {formatDateTime(syncResult.lastSuccessfulSyncAt)}
+      </p>
+      <p className="settings-text">
+        {syncResult.processedItems} plays processed
+      </p>
+      <p className="settings-text">
+        {syncResult.newPlayHistoryRows} new plays
+      </p>
+      <p className="settings-text">{syncResult.newTrackRows} new tracks</p>
+      {syncResult.skippedItems > 0 ? (
+        <p className="settings-text">
+          {syncResult.skippedItems} unsupported items skipped
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function formatDateTime(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleString();
 }

@@ -47,6 +47,20 @@ impl Database {
     pub fn path(&self) -> &Path {
         &self.path
     }
+
+    pub fn with_connection<T>(
+        &self,
+        operation: impl FnOnce(&mut Connection) -> Result<T, String>,
+    ) -> Result<T, String> {
+        let mut connection = self.connection.lock().map_err(|_| {
+            format!(
+                "Database connection lock failed for {}",
+                self.path.display()
+            )
+        })?;
+
+        operation(&mut connection)
+    }
 }
 
 pub fn connect(app: &AppHandle) -> Result<Database, String> {

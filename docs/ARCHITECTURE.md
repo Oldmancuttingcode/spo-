@@ -18,9 +18,12 @@ React UI
 
 ## Current Scope
 
-Phase 2 establishes the SQLite foundation. The app opens a local SQLite database during Tauri startup, runs migrations, and stores the database connection in backend-managed state.
+Phase 6 includes the navigation shell, backend-owned SQLite archive, core music
+database schema, Spotify authentication, read-only Recently Played retrieval, and
+manual listening-history sync into the archive.
 
-The current implementation does not include Spotify integration, sync logic, Music Archive domain tables, or application workflows beyond the Phase 1 navigation shell.
+The current implementation does not include Calendar, Library, Track Detail,
+Tags UI, Notes UI, playlist sync, Digging UI, background sync, or playback.
 
 ## Database Layer
 
