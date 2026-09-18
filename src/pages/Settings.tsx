@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import SyncStatus from "../components/SyncStatus";
 
 type SpotifyConnectionState =
   | "connected"
@@ -118,6 +119,7 @@ export default function Settings() {
           onSyncRecentlyPlayed={syncRecentlyPlayed}
         />
       </section>
+      <SyncStatus refresh={isSyncing} />
     </section>
   );
 }
@@ -154,6 +156,7 @@ function SpotifyConnectionContent({
       <div className="settings-stack">
         <p className="spotify-status connected">Connected</p>
         {syncResult ? <SyncSummary syncResult={syncResult} /> : null}
+        <button className="secondary-button" disabled={isSyncing || isDisconnecting} onClick={onConnect}>Reconnect for playlist access</button>
         <div className="settings-actions">
           <button
             className="primary-button"
@@ -174,7 +177,7 @@ function SpotifyConnectionContent({
         </div>
         {syncError ? (
           <div className="settings-stack">
-            <p className="settings-error">Spotify sync failed.</p>
+            <p className="settings-error" role="alert">Spotify sync failed.</p>
             <p className="settings-text">Your local archive is still available.</p>
             <p className="settings-error">{syncError}</p>
           </div>

@@ -36,6 +36,7 @@ Current migrations:
 
 - `1` - database foundation
 - `2` - core music database
+- `3` - playlist snapshot history
 
 ## Timestamp Policy
 
@@ -107,6 +108,22 @@ Important constraints:
 - `playlist_tracks` uses its own `id` and does not make `(playlist_id, track_id)` unique, so repeated tracks in the same playlist remain possible.
 - `digging_sessions` allows active sessions with `end_date = NULL`; when an end date exists, it must be on or after `start_date`.
 
+## Tag Naming and Assignment (Phase 9)
+
+The backend trims surrounding whitespace and rejects empty names or unsupported
+categories. Display casing is preserved. Within one category, Rust Unicode
+lowercase comparison (after trimming) reuses an existing tag rather than creating
+a duplicate. This is simple lowercase matching, not full Unicode case folding or
+accent/normalization matching. The same name in different categories is allowed.
+An immediate SQLite transaction serializes duplicate lookup and insertion;
+the existing case-sensitive `(category, name)` constraint remains the final
+database protection. Existing rows are not renamed or merged.
+
+Lists use lowercase name ordering, then ID for stability. Assigning a tag twice
+is a successful no-op under the existing relationship primary key. Removing a
+tag deletes only the selected `track_tags` row, never the tag itself. No schema
+change, global deletion, predefined tag seeding, or Spotify request is involved.
+
 ## Indexes
 
 Unique constraints provide indexes for Spotify ID lookups and duplicate prevention. Additional indexes support expected query paths:
@@ -151,3 +168,16 @@ or delete personal metadata tables such as `tags`, `track_tags`, `track_notes`,
 ## Calendar and Statistics
 
 Calendar views and statistics are derived from `play_history` and related tables. The database intentionally does not store duplicated calendar summaries, monthly statistics, play counts, most-played tables, or discovery tables.
+
+## Migration 3 — Playlist snapshot history
+
+`playlist_track_history` retains the preceding playlist membership by playlist,
+snapshot, and position before a complete new snapshot replaces `playlist_tracks`.
+Repeated tracks at different positions remain valid. Failed or inaccessible item
+requests do not replace the last saved membership. Tracks, plays, tags, notes,
+and digging are never deleted by playlist sync. No production archive reset is
+required. History is retained for preservation; a snapshot-history UI is not yet
+provided.
+
+Notes use existing personal tables. Calendar and Home are derived from plays.
+Digging validates real YYYY-MM-DD dates and rejects end dates before start dates.

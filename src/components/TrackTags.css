@@ -1,0 +1,18 @@
+.track-tags { margin-top: 28px; padding-top: 24px; border-top: 1px solid #dfe4dd; }
+.tag-category + .tag-category { margin-top: 22px; }
+.tag-category h2 { margin: 0 0 10px; color: #4c5450; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.tag-chips { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.tag-chip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; overflow-wrap: anywhere; border-radius: 16px; background: #e8eee8; padding: 4px 6px 4px 12px; color: #2f3734; }
+.tag-chip button { background: none; border: 0; border-radius: 50%; min-width: 28px; min-height: 28px; font-size: 1.1rem; cursor: pointer; color: inherit; }
+.tag-empty { color: #626a65; font-size: 0.9rem; }
+.tag-add { padding: 6px 12px; }
+.tag-picker { margin-top: 12px; padding: 16px; max-width: 440px; border: 1px solid #dfe4dd; border-radius: 8px; }
+.tag-picker label { display: block; margin-bottom: 8px; font-size: 0.9rem; }
+.tag-picker input { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #aab7ac; border-radius: 4px; font: inherit; }
+.tag-picker input:focus-visible { outline: 2px solid #5e8a7f; outline-offset: 2px; }
+.tag-picker > button { margin: 10px 8px 0 0; max-width: 100%; overflow-wrap: anywhere; }
+.tag-options { list-style: none; padding: 0; margin: 10px 0; max-height: 200px; overflow-y: auto; }
+.tag-options button { width: 100%; text-align: left; padding: 9px 8px; background: transparent; border: 0; border-radius: 4px; font: inherit; cursor: pointer; overflow-wrap: anywhere; }
+.tag-options button:hover:not(:disabled) { background: #e8eee8; }
+.track-tags button:disabled { opacity: 0.55; cursor: default; }
+.track-tags [role="alert"] { color: #9b2d25; }

@@ -4,7 +4,7 @@ Music Archive is a personal desktop application for recording music discovery, l
 
 ## Current Status
 
-Phase 8 - Track Detail
+MVP implementation — desktop and live Spotify validation complete
 
 The Tauri, React, and TypeScript project foundation is in place, along with the navigation shell, backend-owned SQLite archive, core music database schema, Spotify account authentication, and read-only Spotify Recently Played retrieval for development validation. The backend creates a local `music-archive.db` in the app data directory, enables foreign keys, and runs migration tracking.
 
@@ -20,7 +20,14 @@ play count, First Discovered, and Last Played. Returning preserves the Library
 search and scroll position. The stored Spotify link opens externally on request.
 Track Detail reads SQLite only and does not refresh Spotify metadata.
 
-Playlist sync, tagging workflows, notes workflows, dashboards, and playback are not implemented yet.
+Track Detail supports personal Genre, Mood, Sound, Vocal, and Free Tags. Search
+existing tags within a category, create and assign tags, or remove a track's tag
+without deleting it from other tracks. Tags are stored locally and work without
+Spotify. See `docs/DATABASE.md` for the naming and duplicate policy.
+The tag picker supports Enter to create or assign an exact matching tag, Escape
+to close, and retrying a failed tag list request without leaving Track Detail.
+
+Track Notes, local Calendar, Playlist Archive, Digging, Home, and persisted sync status are implemented. See docs/MVP_VALIDATION.md for tested behavior and remaining live Spotify validation. Playback and background sync are out of scope.
 
 ## Tech Stack
 

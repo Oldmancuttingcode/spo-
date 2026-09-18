@@ -18,12 +18,12 @@ React UI
 
 ## Current Scope
 
-Phase 8 includes the navigation shell, backend-owned SQLite archive, core music
+The MVP implementation includes the navigation shell, backend-owned SQLite archive, core music
 database schema, Spotify authentication, read-only Recently Played retrieval,
-manual listening-history sync into the archive, local Library browsing, and Track Detail.
+manual listening-history sync into the archive, local Library browsing, Track Detail,
+personal track tags and notes, Calendar, Playlist Archive, Digging, and Home.
 
-The current implementation does not include Calendar,
-Tags UI, Notes UI, playlist sync, Digging UI, background sync, or playback.
+Background sync and playback are out of scope.
 
 ## Database Layer
 
@@ -35,6 +35,12 @@ Database code lives under `src-tauri/src/database`:
 React does not access SQLite directly. Future UI features should call Tauri commands, and those commands should use the backend database layer.
 
 ## Boundaries
+
+Track tags use separate `track_tags`, `list_tags`, `create_tag`,
+`assign_tag_to_track`, and `remove_tag_from_track` commands in `tags.rs`.
+The TrackTags component owns category filtering and pending/error UI; the backend
+validates input and owns all SQLite reads and writes. Successful mutations reload
+only assigned tags. Spotify authentication and sync are not involved.
 
 Library uses SQLite -> `library_tracks` -> Library DTO -> React. One SQL query
 aggregates plays and ordered artist credits separately before joining tracks.
@@ -59,3 +65,16 @@ Neither detail lookup nor rendering requires Spotify authentication or API calls
 - React UI should not call the Spotify API directly.
 - Database, Spotify integration, application logic, and UI should remain separate responsibilities.
 - The architecture should stay simple for the current project size.
+
+## Remaining MVP modules
+
+- `notes.rs`: explicit track note upsert/delete; blank input removes only the note.
+- `calendar.rs`: aggregates UTC plays within frontend-provided local-midnight bounds. Each day uses its own bounds for DST; discoveries use the earliest play across all history.
+- `spotify/playlists.rs`: paginated read-only Spotify import with timeouts, snapshot recheck, and per-playlist transactions. Blocking HTTP runs off the UI thread. Concurrent sync requests are rejected.
+- `playlists.rs`: local playlist detail, description/memo, tags, and validated external link.
+- `digging.rs`: validated date ranges, active/past sessions, duplicate-safe track membership.
+- Home composes existing Library, Calendar, and Digging commands; no summary tables.
+- `sync_status.rs`: reads persisted sync success/error state for Settings.
+- Shared `ArchiveTracks`, artwork, and archive styles provide consistent rows and responsive layouts. Track notes warn before abandoning unsaved text.
+
+See `MVP_VALIDATION.md` for implementation status and actual validation limits.

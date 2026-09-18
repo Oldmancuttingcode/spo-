@@ -4,7 +4,7 @@ pub const CALLBACK_PORT: u16 = 8888;
 pub const CALLBACK_PATH: &str = "/callback";
 pub const AUTHORIZATION_URL: &str = "https://accounts.spotify.com/authorize";
 pub const TOKEN_URL: &str = "https://accounts.spotify.com/api/token";
-pub const PHASE_FOUR_SCOPE: &str = "user-read-recently-played";
+pub const PHASE_FOUR_SCOPE: &str = "user-read-recently-played playlist-read-private";
 
 const CLIENT_ID_ENV_VAR: &str = "SPOTIFY_CLIENT_ID";
 

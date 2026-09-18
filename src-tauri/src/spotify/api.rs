@@ -271,7 +271,7 @@ impl From<SpotifyContext> for PlayContext {
 }
 
 #[derive(Debug, Deserialize)]
-struct SpotifyTrack {
+pub(crate) struct SpotifyTrack {
     id: Option<String>,
     name: String,
     duration_ms: Option<u32>,

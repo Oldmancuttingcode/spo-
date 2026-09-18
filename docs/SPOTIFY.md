@@ -258,3 +258,23 @@ Music Archive can archive only listening events that Spotify's Recently Played
 API still exposes when sync runs. If the app is not synced for a long period,
 some Spotify listening history may no longer be available from Spotify and
 cannot necessarily be reconstructed by Music Archive.
+
+## Playlist import (MVP)
+
+Read-only endpoints: GET /v1/me, GET /v1/me/playlists and
+GET /v1/playlists/{id}/items. The importer uses 50-item pages and checks the
+playlist snapshot again after fetching items. It supports current `item` and
+legacy `track` payloads, skipping null, local, and non-track items. A failed
+snapshot transaction rolls back. Playlist import never creates listening plays.
+
+OAuth now requests user-read-recently-played and playlist-read-private. Existing
+users can use Settings > Reconnect for playlist access to approve the added
+read permission. Spotify may still deny items for playlists the user does not
+own or collaborate on. Metadata and prior archive remain available.
+
+Sources checked during implementation:
+https://developer.spotify.com/documentation/web-api/reference/get-a-list-of-current-users-playlists
+https://developer.spotify.com/documentation/web-api/reference/get-playlists-items
+
+HTTP 401, 403, 429 (Retry-After), network, and malformed responses produce safe
+errors. No automatic retry loop or Spotify write endpoint is used.

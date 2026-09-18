@@ -2,10 +2,11 @@ mod api;
 mod auth;
 mod config;
 mod credentials;
+pub mod playlists;
 mod sync;
 
 use serde::Serialize;
-use tauri::State;
+use tauri::{Manager, State};
 
 use crate::database::Database;
 
@@ -48,11 +49,14 @@ pub fn spotify_connection_status(spotify_auth: State<'_, SpotifyAuth>) -> Spotif
 }
 
 #[tauri::command]
-pub fn spotify_connect(
-    spotify_auth: State<'_, SpotifyAuth>,
-) -> Result<SpotifyConnectionStatus, String> {
-    spotify_auth.connect()?;
-    Ok(spotify_auth.connection_status())
+pub async fn spotify_connect(app: tauri::AppHandle) -> Result<SpotifyConnectionStatus, String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        let auth = app.state::<SpotifyAuth>();
+        auth.connect()?;
+        Ok(auth.connection_status())
+    })
+    .await
+    .map_err(|_| "Spotify connection stopped unexpectedly.".to_string())?
 }
 
 #[tauri::command]
@@ -75,7 +79,21 @@ pub fn spotify_recently_played(
 }
 
 #[tauri::command]
-pub fn spotify_sync_recently_played(
+pub async fn spotify_sync_recently_played(
+    app: tauri::AppHandle,
+) -> Result<ListeningHistorySyncResult, String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        static SYNC: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let _guard = SYNC
+            .try_lock()
+            .map_err(|_| "Listening history sync is already running.".to_string())?;
+        sync_recently_played(app.state::<SpotifyAuth>(), app.state::<Database>())
+    })
+    .await
+    .map_err(|_| "Listening sync stopped unexpectedly.".to_string())?
+}
+
+fn sync_recently_played(
     spotify_auth: State<'_, SpotifyAuth>,
     database: State<'_, Database>,
 ) -> Result<ListeningHistorySyncResult, String> {

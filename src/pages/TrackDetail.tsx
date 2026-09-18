@@ -2,6 +2,9 @@ import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useRef, useState } from "react";
 import Artwork from "../components/Artwork";
 import ArchiveDate from "../components/ArchiveDate";
+import TrackTags from "../components/TrackTags";
+import TrackNote from "../components/TrackNote";
+import { canLeave } from "../unsaved";
 import "./TrackDetail.css";
 
 interface TrackDetailData {
@@ -23,7 +26,7 @@ function durationLabel(milliseconds: number) {
   return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 }
 
-export default function TrackDetail({ trackId, onBack }: { trackId: number; onBack: () => void }) {
+export default function TrackDetail({ trackId, onBack, backLabel = "Library" }: { trackId: number; onBack: () => void; backLabel?: string }) {
   const [track, setTrack] = useState<TrackDetailData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -59,7 +62,7 @@ export default function TrackDetail({ trackId, onBack }: { trackId: number; onBa
 
   return (
     <section className="page track-detail-page" aria-label="Track detail">
-      <button ref={backButton} type="button" className="secondary-button track-back" onClick={onBack}>← Library</button>
+      <button ref={backButton} type="button" className="secondary-button track-back" onClick={() => { if (canLeave()) onBack(); }}>← {backLabel}</button>
       {loading && <p role="status">Loading track…</p>}
       {!loading && error && <div role="alert" className="track-detail-message">
         <p>Could not load this track.</p>
@@ -86,6 +89,8 @@ export default function TrackDetail({ trackId, onBack }: { trackId: number; onBa
             <div><dt>Last Played</dt><dd><ArchiveDate value={track.last_played_at} emptyText="Not yet played" /></dd></div>
           </dl>
         </section>
+        <TrackTags key={track.id} trackId={track.id} />
+        <TrackNote key={`note-${track.id}`} trackId={track.id} />
         {track.spotify_url && <div className="track-spotify-link">
           <button type="button" className="secondary-button" disabled={opening} onClick={openSpotify}>{opening ? "Opening Spotify…" : "Open in Spotify"}</button>
           {openError && <p role="alert">{openError}</p>}

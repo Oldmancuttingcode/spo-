@@ -171,6 +171,18 @@ const MIGRATIONS: &[Migration] = &[
             CREATE INDEX idx_digging_tracks_digging_id ON digging_tracks(digging_id);
         ",
     },
+    Migration {
+        version: 3,
+        name: "playlist snapshot history",
+        sql: "CREATE TABLE playlist_track_history (
+            playlist_id INTEGER NOT NULL REFERENCES playlists(id) ON DELETE CASCADE,
+            snapshot_id TEXT NOT NULL,
+            position INTEGER NOT NULL,
+            track_id INTEGER NOT NULL REFERENCES tracks(id),
+            added_at TEXT,
+            PRIMARY KEY(playlist_id,snapshot_id,position)
+        );",
+    },
 ];
 
 pub fn run(connection: &mut Connection, database_path: &Path) -> Result<(), String> {
@@ -290,7 +302,7 @@ mod tests {
             })
             .expect("migration count can be read");
 
-        assert_eq!(migration_count, 2);
+        assert_eq!(migration_count, 3);
 
         drop(connection);
         fs::remove_file(database_path).expect("test database can be removed");
@@ -413,7 +425,7 @@ mod tests {
             .expect("migration query runs")
             .collect::<Result<Vec<_>, _>>()
             .expect("migration rows can be read");
-        assert_eq!(migrations, vec![1, 2]);
+        assert_eq!(migrations, vec![1, 2, 3]);
 
         let tracks_table_count: i64 = connection
             .query_row(

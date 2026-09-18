@@ -1,0 +1,43 @@
+.page { max-width: 1120px; }
+.page > h1 { margin: 20px 0; }
+button:focus-visible { outline: 2px solid #5e8a7f; outline-offset: 3px; }
+button:disabled { cursor: default; opacity: .55; }
+.page > button, .action-row > button, .archive-form > button, .archive-section > button, .archive-section form > button { border: 1px solid #b9c8bd; border-radius: 7px; padding: 9px 15px; background: #edf2ec; color: #203a35; font: inherit; cursor: pointer; }
+.archive-section { margin-top: 30px; padding-top: 24px; border-top: 1px solid #dfe4dd; }
+.archive-section h2 { margin: 0 0 16px; font-size: 1.15rem; }
+.archive-section label, .archive-form label { display: block; margin: 12px 0; }
+.archive-section input, .archive-section select, .archive-form input, textarea { display: block; width: 100%; border: 1px solid #b9c8bd; border-radius: 6px; padding: 10px; margin: 8px 0 12px; background: #fcfdfb; color: inherit; font: inherit; }
+textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+.archive-form { padding: 18px 0; max-width: 650px; }
+.action-row { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 14px 0; }
+.action-row h2 { margin: 0; font-size: 1.15rem; }
+.muted, .eyebrow { color: #626a65; font-size: .9rem; }
+.eyebrow { letter-spacing: .08em; text-transform: uppercase; }
+.preserve-lines { white-space: pre-wrap; overflow-wrap: anywhere; }
+.home-summary { font-size: 1.1rem; color: #4c5450; }
+.archive-tracks { list-style: none; padding: 0; margin: 0; }
+.archive-track { display: flex; width: 100%; align-items: center; gap: 16px; text-align: left; padding: 10px 0; border: 0; border-bottom: 1px solid #e7ebe5; background: transparent; color: inherit; cursor: pointer; }
+.archive-track:hover { background: #edf2ec; }
+.archive-track > span { flex: 1; min-width: 0; }
+.archive-track strong, .archive-track span span { display: block; overflow-wrap: anywhere; }
+.archive-track span span, .archive-track small { color: #626a65; margin-top: 5px; }
+.archive-cover { width: 58px; height: 58px; flex-shrink: 0; border-radius: 5px; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 5px; }
+.calendar-grid > span { font-size: .8rem; text-align: center; padding: 7px 0; color: #626a65; }
+.calendar-grid button { border: 1px solid #d9e1d8; background: #fcfdfb; color: #203a35; border-radius: 6px; min-height: 92px; padding: 10px; text-align: left; cursor: pointer; }
+.calendar-grid button > * { display: block; }
+.calendar-grid button span, .calendar-grid button small { margin-top: 6px; font-size: .75rem; }
+.calendar-grid button.selected { background: #203a35; color: #fff; }
+.collection-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(180px,1fr)); gap: 24px; margin-top: 30px; }
+.collection-card { background: transparent; border: 0; text-align: left; color: inherit; padding: 0; cursor: pointer; }
+.collection-card strong, .collection-card span, .collection-card small { display: block; margin-top: 8px; overflow-wrap: anywhere; }
+.collection-cover { width: 100%; aspect-ratio: 1; border-radius: 8px; }
+.collection-header { display: flex; align-items: center; gap: 24px; margin-top: 24px; }
+.collection-header > .collection-cover { width: 180px; flex-shrink: 0; }
+.digging-row { display: flex; flex-direction: column; gap: 8px; width: 100%; padding: 18px 0; background: transparent; color: inherit; border: 0; border-bottom: 1px solid #dfe4dd; text-align: left; cursor: pointer; }
+.digging-row:hover { background: #edf2ec; }
+.digging-row span, .digging-row small { color: #626a65; }
+.track-picker { max-height: 330px; overflow-y: auto; margin-top: 14px; }
+.track-picker button { display: block; width: 100%; text-align: left; padding: 12px; background: #fcfdfb; border: 0; border-bottom: 1px solid #dfe4dd; color: inherit; cursor: pointer; }
+[role="alert"] { color: #9b2d25; overflow-wrap: anywhere; }
+@media (max-width: 900px) { .app-shell { grid-template-columns: 180px minmax(0,1fr); } .main-content { padding: 24px; } .calendar-grid button { padding: 7px 4px; } .collection-header { gap: 16px; } .collection-header > .collection-cover { width: 130px; } }

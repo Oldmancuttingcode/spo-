@@ -109,6 +109,29 @@ pub fn persist_recently_played(
     })
 }
 
+pub(super) fn import_track(
+    transaction: &Transaction<'_>,
+    track: super::api::RecentlyPlayedTrack,
+) -> Result<i64, String> {
+    let artists = track
+        .artists
+        .iter()
+        .filter(|a| a.spotify_id.is_some())
+        .collect::<Vec<_>>();
+    let artist_ids = artists
+        .iter()
+        .map(|a| upsert_artist(transaction, a).map(|r| r.id))
+        .collect::<Result<Vec<_>, _>>()?;
+    let item = RecentlyPlayedItem {
+        track,
+        played_at: String::new(),
+        context: None,
+    };
+    let row = upsert_track(transaction, &item)?;
+    replace_track_artists(transaction, row.id, &artist_ids)?;
+    Ok(row.id)
+}
+
 fn persist_play_item(
     transaction: &Transaction<'_>,
     item: &RecentlyPlayedItem,
@@ -690,6 +713,11 @@ mod tests {
         persist_recently_played(&mut connection, &response).expect("sync persists");
 
         assert_eq!(table_count(&connection, "track_tags"), 1);
+        let tag: (String, String, i64) = connection.query_row(
+            "SELECT t.name, t.category, tt.track_id FROM tags t JOIN track_tags tt ON tt.tag_id = t.id WHERE t.id = 1",
+            [], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?))
+        ).expect("personal tag remains unchanged");
+        assert_eq!(tag, ("Warm".into(), "mood".into(), 1));
         assert_eq!(table_count(&connection, "track_notes"), 1);
         let note: String = connection
             .query_row(

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import Sidebar from "./components/Sidebar";
+import "./archive.css";
+import { canLeave } from "./unsaved";
 import { pages, type PageId } from "./pages";
 
 const mainNavigation = [
@@ -25,7 +27,7 @@ export default function App() {
         activePage={activePage}
         mainItems={mainNavigation}
         settingsItem={settingsNavigation}
-        onNavigate={setActivePage}
+        onNavigate={page => { if (page !== activePage && canLeave()) setActivePage(page); }}
       />
 
       <main className="main-content">
